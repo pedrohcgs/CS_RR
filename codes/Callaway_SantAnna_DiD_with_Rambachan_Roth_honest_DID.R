@@ -170,7 +170,7 @@ summary(CS_es_never_cond)
 fig_CS <- ggdid(CS_es_never_cond,
       title = "Event-study aggregation \n DiD based on conditional PTA and using never-treated as comparison group ")
 # Save event study plot
-ggsave(here("plots","CS_es_nv_X_fixed_baseline.pdf"),
+ggsave(here("plots","CS_es_nv_X_fixed_baseline.png"),
        fig_CS,  
        dpi = 500,
        width = 14, 
