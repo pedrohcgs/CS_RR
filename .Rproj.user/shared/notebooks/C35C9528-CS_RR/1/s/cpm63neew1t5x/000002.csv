@@ -1,0 +1,2 @@
+"0","# Load data used in Callaway and Sant'Anna (2021) application"
+"0","min_wage <- readRDS(url(""https://psantanna.com/files/min_wage_CS.rds""))"
