@@ -12,7 +12,7 @@ knitr::opts_chunk$set(
 ```
 
 
-## Introduction
+## Sensitivity Analysis for Heterogeneity-Robust DiD Procedures:  \n  Combining Callaway and Sant'Anna (2021) with Rambachan and Roth (2021)
 
 The main goal of this repository is to illustrate how one can combine the heterogeneity-robust Difference-in-Differences procedures proposed by Callaway and Sant'Anna (2021) with the sensitivity analysis tools for potential violations of parallel trends proposed by Rambachan and Roth (2021). These are currently implemented in the `did` and `HonestDiD` `R` packages.
 
@@ -160,7 +160,7 @@ honest_did.AGGTEobj <- function(es,
 
 ```
 
-## Effect of Minimum Wage on Teen Employment: Replicating Callaway and Sant'Anna (2021)
+## Effect of Minimum Wage on Teen Employment: \n Replicating Callaway and Sant'Anna (2021)
 
 Now, let's load the data used in Callaway and Sant'Anna (2021)
 ```{r load_data,  message = FALSE, warning = FALSE, cache = TRUE, cache.lazy = TRUE, fig.width=8,fig.height=5, fig.align='center', out.width="90%", dpi = 200}
@@ -246,7 +246,7 @@ ggsave(here("plots","cs_HDiD_relmag.png"),
        height = 7)
 ```
 ![](plots/cs_HDiD_relmag.png){ width=100% }
-![](twfe_files/cs_HDiD_relmag.png){ width=100% }
+![](plots/cs_HDiD_relmag.png){ width=100% }
 
 
 ## Conclusion
