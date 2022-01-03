@@ -1,4 +1,6 @@
 
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
 ## Sensitivity Analysis for Heterogeneity-Robust DiD Procedures: Combining Callaway and Sant’Anna (2021) with Rambachan and Roth (2021)
 
 The main goal of this repository is to illustrate how one can combine
@@ -226,24 +228,12 @@ hd_cs_rm_never$robust_ci <- hd_cs_rm_never$robust_ci[-1,]
 # make sensitivity analysis plots
 cs_HDiD_smooth <- createSensitivityPlot(hd_cs_smooth_never$robust_ci,
                       hd_cs_smooth_never$orig_ci)
+cs_HDiD_smooth
 
 cs_HDiD_relmag <- createSensitivityPlot_relativeMagnitudes(hd_cs_rm_never$robust_ci,
                                          hd_cs_rm_never$orig_ci)
-## -----------------------------------------------------------------------------
-# Save plots
-ggsave(here("plots","cs_HDiD_smooth.png"),
-       cs_HDiD_smooth,  
-       dpi = 500,
-       width = 14, 
-       height = 7)
 
-
-# Save plots
-ggsave(here("plots","cs_HDiD_relmag.png"),
-       cs_HDiD_relmag,  
-       dpi = 500,
-       width = 14, 
-       height = 7)
+cs_HDiD_relmag
 ```
 
 <img src="plots/cs_HDiD_relmag.png" style="width:100.0%" />
@@ -251,10 +241,10 @@ ggsave(here("plots","cs_HDiD_relmag.png"),
 
 ## Conclusion
 
-In this vignette, we have shown that it is straightforward to combine
-the Callaway and Sant’Anna (2021) DiD procedures implemented in the
-`did` package, with the sentivity analysis proposed by Rambachan and
-Roth (2021) implemented in the `HonestDiD` package.
+In this repo, we have shown that it is straightforward to combine the
+Callaway and Sant’Anna (2021) DiD procedures implemented in the `did`
+package, with the sentivity analysis proposed by Rambachan and Roth
+(2021) implemented in the `HonestDiD` package.
 
 ## References
 
