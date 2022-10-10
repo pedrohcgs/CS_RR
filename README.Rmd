@@ -14,9 +14,9 @@ knitr::opts_chunk$set(
 ```
 
 
-## Sensitivity Analysis for Heterogeneity-Robust DiD Procedures:  \n  Combining Callaway and Sant'Anna (2021) with Rambachan and Roth (2021)
+## Sensitivity Analysis for Heterogeneity-Robust DiD Procedures:  \n  Combining Callaway and Sant'Anna (2021) with Rambachan and Roth (2022)
 
-The main goal of this repository is to illustrate how one can combine the heterogeneity-robust Difference-in-Differences procedures proposed by Callaway and Sant'Anna (2021) with the sensitivity analysis tools for potential violations of parallel trends proposed by Rambachan and Roth (2021). These are currently implemented in the `did` and `HonestDiD` `R` packages.
+The main goal of this repository is to illustrate how one can combine the heterogeneity-robust Difference-in-Differences procedures proposed by Callaway and Sant'Anna (2021) with the sensitivity analysis tools for potential violations of parallel trends proposed by Rambachan and Roth (2022). These are currently implemented in the `did` and `HonestDiD` `R` packages.
 
 
 Towards that end, we will use the empirical application considered in Callaway and Sant'Anna (2021) about the effect of minimum wage on teen employment. 
@@ -56,7 +56,7 @@ Since this integration is still a work-in-progress and has not yet been merged i
 #' @title honest_did
 #'
 #' @description a function to compute a sensitivity analysis
-#'  using the approach of Rambachan and Roth (2021)
+#'  using the approach of Rambachan and Roth (2022)
 #' @param es an event study
 honest_did <- function(es, ...) {
   UseMethod("honest_did", es)
@@ -66,7 +66,7 @@ honest_did <- function(es, ...) {
 #' @title honest_did.AGGTEobj
 #'
 #' @description a function to compute a sensitivity analysis
-#'  using the approach of Rambachan and Roth (2021) when
+#'  using the approach of Rambachan and Roth (2022) when
 #'  the event study is estimating using the `did` package
 #'
 #' @param e event time to compute the sensitivity analysis for.
@@ -207,7 +207,7 @@ From a closing inspection of this event-study plot, one can see that a straight 
 
 How can we tackle this concern?
 
-## Sentitivity Analysis using Rambachan and Roth (2021)
+## Sentitivity Analysis using Rambachan and Roth (2022)
 
 
 Now, let's do the sensitivity analysis for violation of (conditional) parallel trends
@@ -236,19 +236,19 @@ cs_HDiD_relmag <- createSensitivityPlot_relativeMagnitudes(hd_cs_rm_never$robust
 cs_HDiD_relmag
 
 ```
-![](plots/cs_HDiD_relmag.png){ width=100% }
+![](plots/cs_HDiD_smooth.png){ width=100% }
 ![](plots/cs_HDiD_relmag.png){ width=100% }
 
 
 ## Conclusion
 
-In this repo, we have shown that it is straightforward to combine the Callaway and Sant'Anna (2021) DiD procedures implemented in the `did` package, with the sentivity analysis proposed by Rambachan and Roth (2021) implemented in the `HonestDiD` package. 
+In this repo, we have shown that it is straightforward to combine the Callaway and Sant'Anna (2021) DiD procedures implemented in the `did` package, with the sentivity analysis proposed by Rambachan and Roth (2022) implemented in the `HonestDiD` package. 
 
 ## References
 
 
-* [Callaway, Brantly, and Pedro H. C. Sant'Anna. "Difference-in-differences with multiple time periods." Forthcoming at the Journal of Econometrics (2021)](https://authors.elsevier.com/a/1cFzc15Dji4pnC).
+* [Callaway, Brantly, and Pedro H. C. Sant'Anna. "Difference-in-differences with multiple time periods." Journal of Econometrics (2021)](https://www.sciencedirect.com/science/article/pii/S0304407620303948).
 
 
-* [Rambachan, Ashesh, and Jonathan Roth. "An Honest Approach to Parallel Trends" (2021).](https://jonathandroth.github.io/assets/files/HonestParallelTrends_Main.pdf)
+* [Rambachan, Ashesh, and Jonathan Roth. "A More Credible Approach to Parallel Trends." Forthcoming at the Review of Economic Studies (2022).](https://jonathandroth.github.io/assets/files/HonestParallelTrends_Main.pdf)
 

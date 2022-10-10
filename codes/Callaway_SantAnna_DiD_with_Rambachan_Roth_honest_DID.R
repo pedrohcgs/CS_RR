@@ -4,7 +4,7 @@
 #      Main goal: show how we can do sensitivy analysis
 #      for potential violations of parallel trends.
 #      Combine Callaway and Sant'Anna (2021) with 
-#      Rambachan and Roth (2021)
+#      Rambachan and Roth (2022)
 #---------------------------------------------------
 # Install some packages
 library(devtools)
@@ -32,7 +32,7 @@ library(HonestDiD)
 #' @title honest_did
 #'
 #' @description a function to compute a sensitivity analysis
-#'  using the approach of Rambachan and Roth (2021)
+#'  using the approach of Rambachan and Roth (2022)
 #' @param es an event study
 honest_did <- function(es, ...) {
   UseMethod("honest_did", es)
@@ -42,7 +42,7 @@ honest_did <- function(es, ...) {
 #' @title honest_did.AGGTEobj
 #'
 #' @description a function to compute a sensitivity analysis
-#'  using the approach of Rambachan and Roth (2021) when
+#'  using the approach of Rambachan and Roth (2022) when
 #'  the event study is estimating using the `did` package
 #'
 #' @param e event time to compute the sensitivity analysis for.
