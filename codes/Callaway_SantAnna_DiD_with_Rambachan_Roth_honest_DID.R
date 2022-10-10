@@ -55,6 +55,7 @@ honest_did <- function(es, ...) {
 #'  of deviations from parallel trends in pre-treatment periods).
 #' @inheritParams HonestDiD::createSensitivityResults
 #' @inheritParams HonestDid::createSensitivityResults_relativeMagnitudes
+
 honest_did.AGGTEobj <- function(es,
                                 e=0,
                                 type=c("smoothness", "relative_magnitude"),
@@ -70,7 +71,6 @@ honest_did.AGGTEobj <- function(es,
                                 grid.ub=NA,
                                 grid.lb=NA,
                                 ...) {
-  
   
   type <- type[1]
   
@@ -102,10 +102,46 @@ honest_did.AGGTEobj <- function(es,
                                  sigma = V, numPrePeriods = npre,
                                  numPostPeriods = npost,
                                  l_vec = baseVec1)
+  type <- type[1]
+  
+  # make sure that user is passing in an event study
+  if (es$type != "dynamic") {
+    stop("need to pass in an event study")
+  }
+  
+  # check if used universal base period and warn otherwise
+  if (es$DIDparams$base_period != "universal") {
+    stop("Use a universal base period for honest_did")
+  }
+  
+  # recover influence function for event study estimates
+  es_inf_func <- es$inf.function$dynamic.inf.func.e
+  
+  # recover variance-covariance matrix
+  n <- nrow(es_inf_func)
+  V <- t(es_inf_func) %*% es_inf_func / (n*n) 
+  
+  #Remove the coefficient normalized to zero
+  referencePeriodIndex <- which(es$egt == -1)
+  V <- V[-referencePeriodIndex,-referencePeriodIndex]
+  beta <- es$att.egt[-referencePeriodIndex]
+  
+  nperiods <- nrow(V) 
+  npre <- sum(1*(es$egt < -1))
+  npost <- nperiods - npre
+  
+  baseVec1 <- basisVector(index=(e+1),size=npost)
+  
+  orig_ci <- constructOriginalCS(betahat = beta,
+                                 sigma = V, 
+                                 numPrePeriods = npre,
+                                 numPostPeriods = npost,
+                                 l_vec = baseVec1)
   
   if (type=="relative_magnitude") {
     if (is.null(method)) method <- "C-LF"
-    robust_ci <- createSensitivityResults_relativeMagnitudes(betahat = es$att.egt, sigma = V, 
+    robust_ci <- createSensitivityResults_relativeMagnitudes(betahat = beta, 
+                                                             sigma = V, 
                                                              numPrePeriods = npre, 
                                                              numPostPeriods = npost,
                                                              bound=bound,
@@ -116,12 +152,10 @@ honest_did.AGGTEobj <- function(es,
                                                              biasDirection=biasDirection,
                                                              alpha=alpha,
                                                              gridPoints=100,
-                                                             grid.lb=-1,
-                                                             grid.ub=1,
                                                              parallel=parallel)
     
   } else if (type=="smoothness") {
-    robust_ci <- createSensitivityResults(betahat = es$att.egt,
+    robust_ci <- createSensitivityResults(betahat = beta,
                                           sigma = V, 
                                           numPrePeriods = npre, 
                                           numPostPeriods = npost,
@@ -133,8 +167,10 @@ honest_did.AGGTEobj <- function(es,
                                           parallel=parallel)
   }
   
-  list(robust_ci=robust_ci, orig_ci=orig_ci, type=type)
+  return(list(robust_ci=robust_ci, orig_ci=orig_ci, type=type))
 }
+
+
 
 ##-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
