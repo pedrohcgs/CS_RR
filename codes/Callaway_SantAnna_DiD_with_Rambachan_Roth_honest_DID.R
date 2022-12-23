@@ -25,7 +25,7 @@ library(dplyr)
 library(did)
 library(HonestDiD)
 #---------------------------------------------------------------------------------------
-# Aux Functions to integrate did and HonesDiD packages
+# Aux Functions to integrate did and HonestDiD packages
 
 ## -----------------------------------------------------------------------------
 
