@@ -81,36 +81,6 @@ honest_did.AGGTEobj <- function(es,
   
   # check if used universal base period and warn otherwise
   if (es$DIDparams$base_period != "universal") {
-    warning("it is recommended to use a universal base period for honest_did")
-  }
-  
-  # recover influence function for event study estimates
-  es_inf_func <- es$inf.function$dynamic.inf.func.e
-  
-  # recover variance-covariance matrix
-  n <- nrow(es_inf_func)
-  V <- t(es_inf_func) %*% es_inf_func / (n*n) 
-  
-  
-  nperiods <- nrow(V)
-  npre <- sum(1*(es$egt < 0))
-  npost <- nperiods - npre
-  
-  baseVec1 <- basisVector(index=(e+1),size=npost)
-  
-  orig_ci <- constructOriginalCS(betahat = es$att.egt,
-                                 sigma = V, numPrePeriods = npre,
-                                 numPostPeriods = npost,
-                                 l_vec = baseVec1)
-  type <- type[1]
-  
-  # make sure that user is passing in an event study
-  if (es$type != "dynamic") {
-    stop("need to pass in an event study")
-  }
-  
-  # check if used universal base period and warn otherwise
-  if (es$DIDparams$base_period != "universal") {
     stop("Use a universal base period for honest_did")
   }
   
