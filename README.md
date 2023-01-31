@@ -221,12 +221,15 @@ parallel trends
 ``` r
 
 # code for running honest_did
-hd_cs_smooth_never <- honest_did(CS_es_never_cond,
+hd_cs_smooth_never <- honest_did(es = CS_es_never_cond,
+                           e = 0,
                            type="smoothness")
 hd_cs_smooth_never
 
 
-hd_cs_rm_never <- honest_did(CS_es_never_cond, type="relative_magnitude")
+hd_cs_rm_never <- honest_did(es = CS_es_never_cond, 
+                          e = 0,
+                          type="relative_magnitude")
 hd_cs_rm_never
 # Drop 0 as that is not really allowed.
 hd_cs_rm_never$robust_ci <- hd_cs_rm_never$robust_ci[-1,]
