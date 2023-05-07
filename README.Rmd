@@ -105,7 +105,7 @@ honest_did.AGGTEobj <- function(es,
   
   # check if used universal base period and warn otherwise
   if (es$DIDparams$base_period != "universal") {
-    warning("it is recommended to use a universal base period for honest_did")
+    stop("Use a universal base period for honest_did")
   }
   
   # recover influence function for event study estimates
@@ -115,21 +115,25 @@ honest_did.AGGTEobj <- function(es,
   n <- nrow(es_inf_func)
   V <- t(es_inf_func) %*% es_inf_func / (n*n) 
   
+  #Remove the coefficient normalized to zero
+  referencePeriodIndex <- which(es$egt == -1)
+  V <- V[-referencePeriodIndex,-referencePeriodIndex]
+  beta <- es$att.egt[-referencePeriodIndex]
   
-  nperiods <- nrow(V)
-  npre <- sum(1*(es$egt < 0))
+  nperiods <- nrow(V) 
+  npre <- sum(1*(es$egt < -1))
   npost <- nperiods - npre
   
   baseVec1 <- basisVector(index=(e+1),size=npost)
   
-  orig_ci <- constructOriginalCS(betahat = es$att.egt,
+  orig_ci <- constructOriginalCS(betahat = beta,
                                  sigma = V, numPrePeriods = npre,
                                  numPostPeriods = npost,
                                  l_vec = baseVec1)
   
   if (type=="relative_magnitude") {
     if (is.null(method)) method <- "C-LF"
-    robust_ci <- createSensitivityResults_relativeMagnitudes(betahat = es$att.egt, sigma = V, 
+    robust_ci <- createSensitivityResults_relativeMagnitudes(betahat = beta, sigma = V, 
                                                              numPrePeriods = npre, 
                                                              numPostPeriods = npost,
                                                              bound=bound,
@@ -140,12 +144,10 @@ honest_did.AGGTEobj <- function(es,
                                                              biasDirection=biasDirection,
                                                              alpha=alpha,
                                                              gridPoints=100,
-                                                             grid.lb=-1,
-                                                             grid.ub=1,
                                                              parallel=parallel)
     
   } else if (type=="smoothness") {
-    robust_ci <- createSensitivityResults(betahat = es$att.egt,
+    robust_ci <- createSensitivityResults(betahat = beta,
                                           sigma = V, 
                                           numPrePeriods = npre, 
                                           numPostPeriods = npost,
@@ -157,7 +159,7 @@ honest_did.AGGTEobj <- function(es,
                                           parallel=parallel)
   }
   
-  list(robust_ci=robust_ci, orig_ci=orig_ci, type=type)
+  return(list(robust_ci=robust_ci, orig_ci=orig_ci, type=type))
 }
 
 ```
@@ -214,14 +216,17 @@ Now, let's do the sensitivity analysis for violation of (conditional) parallel t
 ```{r RR_sensitivity, message = FALSE, warning = FALSE, cache = TRUE, cache.lazy = TRUE, fig.width=8,fig.height=5, fig.align='center', out.width="90%", dpi = 200}
 
 # code for running honest_did
-hd_cs_smooth_never <- honest_did(CS_es_never_cond,
+hd_cs_smooth_never <- honest_did(es = CS_es_never_cond,
+                           e = 0,
                            type="smoothness")
 hd_cs_smooth_never
 
 
-hd_cs_rm_never <- honest_did(CS_es_never_cond, type="relative_magnitude")
+hd_cs_rm_never <- honest_did(es = CS_es_never_cond, 
+                          e = 0,
+                          type="relative_magnitude")
 hd_cs_rm_never
-# Drop 0 as that is not really allowed (this is the same as the original estimator).
+# Drop 0 as that is not really allowed.
 hd_cs_rm_never$robust_ci <- hd_cs_rm_never$robust_ci[-1,]
 
 ## -----------------------------------------------------------------------------
