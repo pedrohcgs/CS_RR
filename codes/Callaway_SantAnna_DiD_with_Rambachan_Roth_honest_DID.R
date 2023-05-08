@@ -17,18 +17,6 @@ install_github("asheshrambachan/HonestDiD", dependencies = TRUE)
 #-----------------------------------------------------------------------------
 # Libraries
 # Load libraries
-library(ggplot2)
-library(here)
-library(foreign)
-library(tidyverse)
-library(dplyr)
-library(did)
-library(HonestDiD)
-#---------------------------------------------------------------------------------------
-# Aux Functions to integrate did and HonestDiD packages
-
-## -----------------------------------------------------------------------------
-
 #' @title honest_did
 #'
 #' @description a function to compute a sensitivity analysis
@@ -55,7 +43,6 @@ honest_did <- function(es, ...) {
 #'  of deviations from parallel trends in pre-treatment periods).
 #' @inheritParams HonestDiD::createSensitivityResults
 #' @inheritParams HonestDid::createSensitivityResults_relativeMagnitudes
-
 honest_did.AGGTEobj <- function(es,
                                 e=0,
                                 type=c("smoothness", "relative_magnitude"),
@@ -71,6 +58,7 @@ honest_did.AGGTEobj <- function(es,
                                 grid.ub=NA,
                                 grid.lb=NA,
                                 ...) {
+  
   
   type <- type[1]
   
@@ -89,7 +77,7 @@ honest_did.AGGTEobj <- function(es,
   
   # recover variance-covariance matrix
   n <- nrow(es_inf_func)
-  V <- t(es_inf_func) %*% es_inf_func / (n*n) 
+  V <- t(es_inf_func) %*% es_inf_func / n / n
   
   #Remove the coefficient normalized to zero
   referencePeriodIndex <- which(es$egt == -1)
@@ -103,15 +91,13 @@ honest_did.AGGTEobj <- function(es,
   baseVec1 <- basisVector(index=(e+1),size=npost)
   
   orig_ci <- constructOriginalCS(betahat = beta,
-                                 sigma = V, 
-                                 numPrePeriods = npre,
+                                 sigma = V, numPrePeriods = npre,
                                  numPostPeriods = npost,
                                  l_vec = baseVec1)
   
   if (type=="relative_magnitude") {
     if (is.null(method)) method <- "C-LF"
-    robust_ci <- createSensitivityResults_relativeMagnitudes(betahat = beta, 
-                                                             sigma = V, 
+    robust_ci <- createSensitivityResults_relativeMagnitudes(betahat = beta, sigma = V, 
                                                              numPrePeriods = npre, 
                                                              numPostPeriods = npost,
                                                              bound=bound,
@@ -200,10 +186,13 @@ hd_cs_rm_never$robust_ci <- hd_cs_rm_never$robust_ci[-1,]
 ## -----------------------------------------------------------------------------
 # make sensitivity analysis plots
 cs_HDiD_smooth <- createSensitivityPlot(hd_cs_smooth_never$robust_ci,
-                      hd_cs_smooth_never$orig_ci)
+                                        hd_cs_smooth_never$orig_ci)
+cs_HDiD_smooth
 
 cs_HDiD_relmag <- createSensitivityPlot_relativeMagnitudes(hd_cs_rm_never$robust_ci,
-                                         hd_cs_rm_never$orig_ci)
+                                                           hd_cs_rm_never$orig_ci)
+
+cs_HDiD_relmag
 ## -----------------------------------------------------------------------------
 # Save plots
 ggsave(here("plots","cs_HDiD_smooth.png"),
