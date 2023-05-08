@@ -99,7 +99,7 @@ honest_did.AGGTEobj <- function(es,
   
   # check if used universal base period and warn otherwise
   if (es$DIDparams$base_period != "universal") {
-    warning("it is recommended to use a universal base period for honest_did")
+    stop("Use a universal base period for honest_did")
   }
   
   # recover influence function for event study estimates
@@ -114,21 +114,20 @@ honest_did.AGGTEobj <- function(es,
   V <- V[-referencePeriodIndex,-referencePeriodIndex]
   beta <- es$att.egt[-referencePeriodIndex]
   
-  
-  nperiods <- nrow(V)
-  npre <- sum(1*(es$egt < 0))
+  nperiods <- nrow(V) 
+  npre <- sum(1*(es$egt < -1))
   npost <- nperiods - npre
   
   baseVec1 <- basisVector(index=(e+1),size=npost)
   
-  orig_ci <- constructOriginalCS(betahat = es$att.egt,
+  orig_ci <- constructOriginalCS(betahat = beta,
                                  sigma = V, numPrePeriods = npre,
                                  numPostPeriods = npost,
                                  l_vec = baseVec1)
   
   if (type=="relative_magnitude") {
     if (is.null(method)) method <- "C-LF"
-    robust_ci <- createSensitivityResults_relativeMagnitudes(betahat = es$att.egt, sigma = V, 
+    robust_ci <- createSensitivityResults_relativeMagnitudes(betahat = beta, sigma = V, 
                                                              numPrePeriods = npre, 
                                                              numPostPeriods = npost,
                                                              bound=bound,
@@ -139,12 +138,10 @@ honest_did.AGGTEobj <- function(es,
                                                              biasDirection=biasDirection,
                                                              alpha=alpha,
                                                              gridPoints=100,
-                                                             grid.lb=-1,
-                                                             grid.ub=1,
                                                              parallel=parallel)
     
   } else if (type=="smoothness") {
-    robust_ci <- createSensitivityResults(betahat = es$att.egt,
+    robust_ci <- createSensitivityResults(betahat = beta,
                                           sigma = V, 
                                           numPrePeriods = npre, 
                                           numPostPeriods = npost,
@@ -156,7 +153,7 @@ honest_did.AGGTEobj <- function(es,
                                           parallel=parallel)
   }
   
-  list(robust_ci=robust_ci, orig_ci=orig_ci, type=type)
+  return(list(robust_ci=robust_ci, orig_ci=orig_ci, type=type))
 }
 ```
 
@@ -258,11 +255,11 @@ package, with the sentivity analysis proposed by Rambachan and Roth
 
 ## References
 
--   [Callaway, Brantly, and Pedro H. C. Sant’Anna.
-    “Difference-in-differences with multiple time periods.” Journal of
-    Econometrics
-    (2021)](https://www.sciencedirect.com/science/article/pii/S0304407620303948).
+- [Callaway, Brantly, and Pedro H. C. Sant’Anna.
+  “Difference-in-differences with multiple time periods.” Journal of
+  Econometrics
+  (2021)](https://www.sciencedirect.com/science/article/pii/S0304407620303948).
 
--   [Rambachan, Ashesh, and Jonathan Roth. “A More Credible Approach to
-    Parallel Trends.” Forthcoming at the Review of Economic Studies
-    (2022).](https://jonathandroth.github.io/assets/files/HonestParallelTrends_Main.pdf)
+- [Rambachan, Ashesh, and Jonathan Roth. “A More Credible Approach to
+  Parallel Trends.” Forthcoming at the Review of Economic Studies
+  (2022).](https://jonathandroth.github.io/assets/files/HonestParallelTrends_Main.pdf)
