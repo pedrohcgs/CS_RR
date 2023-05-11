@@ -44,23 +44,16 @@ merged into neither the `did` nor the `HonestDiD` R packages, let’s
 define some auxiliary functions that will help implementing it.
 
 ``` r
-
-## -----------------------------------------------------------------------------
-
 #' @title honest_did
 #'
 #' @description a function to compute a sensitivity analysis
-#'  using the approach of Rambachan and Roth (2022)
-#' @param es an event study
-honest_did <- function(es, ...) {
-  UseMethod("honest_did", es)
-}
-
+#'  using the approach of Rambachan and Roth (2021)
+honest_did <- function(...) UseMethod("honest_did")
 
 #' @title honest_did.AGGTEobj
 #'
 #' @description a function to compute a sensitivity analysis
-#'  using the approach of Rambachan and Roth (2022) when
+#'  using the approach of Rambachan and Roth (2021) when
 #'  the event study is estimating using the `did` package
 #'
 #' @param e event time to compute the sensitivity analysis for.
@@ -74,85 +67,63 @@ honest_did <- function(es, ...) {
 #' @inheritParams HonestDiD::createSensitivityResults
 #' @inheritParams HonestDid::createSensitivityResults_relativeMagnitudes
 honest_did.AGGTEobj <- function(es,
-                                e=0,
-                                type=c("smoothness", "relative_magnitude"),
-                                method=NULL,
-                                bound="deviation from parallel trends",
-                                Mvec=NULL,
-                                Mbarvec=NULL,
-                                monotonicityDirection=NULL,
-                                biasDirection=NULL,
-                                alpha=0.05,
-                                parallel=FALSE,
-                                gridPoints=10^3,
-                                grid.ub=NA,
-                                grid.lb=NA,
+                                e          = 0,
+                                type       = c("smoothness", "relative_magnitude"),
+                                gridPoints = 100,
                                 ...) {
-  
-  
-  type <- type[1]
-  
-  # make sure that user is passing in an event study
+
+  type <- match.arg(type)
+
+  # Make sure that user is passing in an event study
   if (es$type != "dynamic") {
     stop("need to pass in an event study")
   }
-  
-  # check if used universal base period and warn otherwise
+
+  # Check if used universal base period and warn otherwise
   if (es$DIDparams$base_period != "universal") {
     stop("Use a universal base period for honest_did")
   }
-  
-  # recover influence function for event study estimates
+
+  # Recover influence function for event study estimates
   es_inf_func <- es$inf.function$dynamic.inf.func.e
-  
-  # recover variance-covariance matrix
+
+  # Recover variance-covariance matrix
   n <- nrow(es_inf_func)
   V <- t(es_inf_func) %*% es_inf_func / n / n
-  
-  #Remove the coefficient normalized to zero
+
+  # Remove the coefficient normalized to zero
   referencePeriodIndex <- which(es$egt == -1)
-  V <- V[-referencePeriodIndex,-referencePeriodIndex]
+  V    <- V[-referencePeriodIndex,-referencePeriodIndex]
   beta <- es$att.egt[-referencePeriodIndex]
-  
-  nperiods <- nrow(V) 
-  npre <- sum(1*(es$egt < -1))
-  npost <- nperiods - npre
-  
+
+  nperiods <- nrow(V)
+  npre     <- sum(1*(es$egt < -1))
+  npost    <- nperiods - npre
   baseVec1 <- basisVector(index=(e+1),size=npost)
-  
-  orig_ci <- constructOriginalCS(betahat = beta,
-                                 sigma = V, numPrePeriods = npre,
-                                 numPostPeriods = npost,
-                                 l_vec = baseVec1)
-  
+  orig_ci  <- constructOriginalCS(betahat        = beta,
+                                  sigma          = V,
+                                  numPrePeriods  = npre,
+                                  numPostPeriods = npost,
+                                  l_vec          = baseVec1)
+
   if (type=="relative_magnitude") {
-    if (is.null(method)) method <- "C-LF"
-    robust_ci <- createSensitivityResults_relativeMagnitudes(betahat = beta, sigma = V, 
-                                                             numPrePeriods = npre, 
+    robust_ci <- createSensitivityResults_relativeMagnitudes(betahat        = beta,
+                                                             sigma          = V,
+                                                             numPrePeriods  = npre,
                                                              numPostPeriods = npost,
-                                                             bound=bound,
-                                                             method=method,
-                                                             l_vec = baseVec1,
-                                                             Mbarvec = Mbarvec,
-                                                             monotonicityDirection=monotonicityDirection,
-                                                             biasDirection=biasDirection,
-                                                             alpha=alpha,
-                                                             gridPoints=100,
-                                                             parallel=parallel)
-    
-  } else if (type=="smoothness") {
-    robust_ci <- createSensitivityResults(betahat = beta,
-                                          sigma = V, 
-                                          numPrePeriods = npre, 
+                                                             l_vec          = baseVec1,
+                                                             gridPoints     = gridPoints,
+                                                             ...)
+
+  } else if (type == "smoothness") {
+    robust_ci <- createSensitivityResults(betahat        = beta,
+                                          sigma          = V,
+                                          numPrePeriods  = npre,
                                           numPostPeriods = npost,
-                                          method=method,
-                                          l_vec = baseVec1,
-                                          monotonicityDirection=monotonicityDirection,
-                                          biasDirection=biasDirection,
-                                          alpha=alpha,
-                                          parallel=parallel)
+                                          l_vec          = baseVec1,
+                                          ...)
   }
-  
+
   return(list(robust_ci=robust_ci, orig_ci=orig_ci, type=type))
 }
 ```
